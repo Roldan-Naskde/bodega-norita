@@ -1,0 +1,170 @@
+-- Crear la base de datos
+CREATE DATABASE IF NOT EXISTS bodega_norita_bd;
+
+-- Usar la base de datos
+USE bodega_norita_bd;
+
+-- Crear la tabla productos
+CREATE TABLE IF NOT EXISTS productos (
+    idproducto INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    precio DECIMAL(10, 2) NOT NULL
+);
+
+-- Crear la tabla productos_stock
+CREATE TABLE IF NOT EXISTS productos_stock (
+    idproducto INT NOT NULL,
+    cantidad_ingreso INT NOT NULL,
+    cantidad_disponible INT NOT NULL,
+    PRIMARY KEY (idproducto),
+    FOREIGN KEY (idproducto) REFERENCES productos(idproducto) ON DELETE CASCADE
+);
+
+DELIMITER $$
+
+CREATE PROCEDURE eliminar_producto(
+    IN p_idproducto INT
+)
+BEGIN
+    -- Iniciar una transacción
+    START TRANSACTION;
+
+    -- Eliminar el producto de la tabla productos_stock
+    DELETE FROM productos_stock WHERE idproducto = p_idproducto;
+
+    -- Eliminar el producto de la tabla productos
+    DELETE FROM productos WHERE idproducto = p_idproducto;
+
+    -- Confirmar la transacción
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE actualizar_producto(
+    IN p_idproducto INT,
+    IN p_nombre VARCHAR(100),
+    IN p_descripcion TEXT,
+    IN p_precio DECIMAL(10, 2),
+    IN p_cantidad_ingreso INT
+)
+BEGIN
+    -- Declarar una variable para calcular la cantidad disponible
+    DECLARE cantidad_disponible_actual INT;
+
+    -- Obtener la cantidad disponible actual del producto
+    SELECT cantidad_disponible INTO cantidad_disponible_actual
+    FROM productos_stock
+    WHERE idproducto = p_idproducto;
+
+    -- Actualizar la tabla productos
+    UPDATE productos
+    SET 
+        nombre = p_nombre,
+        descripcion = p_descripcion,
+        precio = p_precio
+    WHERE idproducto = p_idproducto;
+
+    -- Actualizar la tabla productos_stock
+    UPDATE productos_stock
+    SET 
+        cantidad_ingreso = p_cantidad_ingreso,
+        cantidad_disponible = cantidad_disponible_actual + (p_cantidad_ingreso - cantidad_ingreso)
+    WHERE idproducto = p_idproducto;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE filtrar_productos(
+    IN p_search VARCHAR(255)
+)
+BEGIN
+    IF p_search IS NOT NULL AND p_search != '' THEN
+        SELECT 
+            p.idproducto,
+            p.nombre,
+            p.descripcion,
+            p.precio,
+            ps.cantidad_ingreso,
+            ps.cantidad_disponible
+        FROM productos p
+        LEFT JOIN productos_stock ps ON p.idproducto = ps.idproducto
+        WHERE p.nombre LIKE CONCAT('%', p_search, '%')
+           OR p.descripcion LIKE CONCAT('%', p_search, '%');
+    ELSE
+        SELECT 
+            p.idproducto,
+            p.nombre,
+            p.descripcion,
+            p.precio,
+            ps.cantidad_ingreso,
+            ps.cantidad_disponible
+        FROM productos p
+        LEFT JOIN productos_stock ps ON p.idproducto = ps.idproducto;
+    END IF;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE PROCEDURE `listar_productos`()
+BEGIN
+    SELECT 
+        p.idproducto,
+        p.nombre,
+        p.descripcion,
+        p.precio,
+        ps.cantidad_ingreso,
+        ps.cantidad_disponible
+    FROM 
+        productos p
+    LEFT JOIN 
+        productos_stock ps
+    ON 
+        p.idproducto = ps.idproducto;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `registrar_producto`(
+    IN p_nombre VARCHAR(100),
+    IN p_descripcion TEXT,
+    IN p_precio DECIMAL(10, 2),
+    IN p_cantidad_ingreso INT
+)
+BEGIN
+    DECLARE last_id INT;
+
+    -- Iniciar una transacción
+    START TRANSACTION;
+
+    -- Insertar el producto en la tabla productos
+    INSERT INTO productos (nombre, descripcion, precio)
+    VALUES (p_nombre, p_descripcion, p_precio);
+
+    -- Obtener el último id generado
+    SET last_id = LAST_INSERT_ID();
+
+    -- Insertar el stock inicial en la tabla productos_stock
+    INSERT INTO productos_stock (idproducto, cantidad_ingreso, cantidad_disponible)
+    VALUES (last_id, p_cantidad_ingreso, p_cantidad_ingreso);
+
+    -- Confirmar la transacción
+    COMMIT;
+END$$
+DELIMITER ;
+
+-- Llamar al procedimiento almacenado para registrar productos
+CALL registrar_producto('Producto 1', 'Descripción del Producto 1', 10.50, 100);
+CALL registrar_producto('Producto 2', 'Descripción del Producto 2', 20.00, 200);
+CALL registrar_producto('Producto 3', 'Descripción del Producto 3', 15.75, 150);
+CALL registrar_producto('Producto 4', 'Descripción del Producto 4', 30.99, 50);
+CALL registrar_producto('Producto 5', 'Descripción del Producto 5', 25.00, 75);
