@@ -120,12 +120,48 @@ CALL registrar_producto('Producto 2', 'Descripción del Producto 2', 20.00, 200)
 
 ## Instalación y ejecución
 
-Sigue los pasos descritos anteriormente para configurar el backend, frontend y base de datos.
+### Backend
+
+1. **Instalar dependencias**:
+   Asegúrate de tener un entorno virtual activo y ejecuta:
+   ```bash
+   pip install -r backend/requirements.txt
+   ```
+
+2. **Iniciar el servidor**:
+   Ejecuta el siguiente comando para iniciar el servidor:
+   ```bash
+   uvicorn backend.main:app --reload
+   ```
+
+   El servidor estará disponible en `http://127.0.0.1:8000`.
+
+### Frontend
+
+1. Abre el archivo `frontend/index.html` en tu navegador.
+2. Asegúrate de que el backend esté corriendo para que las funcionalidades estén disponibles.
 
 ## Documentación de la API
 
-La API utiliza los procedimientos almacenados definidos en `base-de-datos.sql` para interactuar con la base de datos. Consulta la sección de [Documentación de la API](#documentación-de-la-api) para más detalles.
+La API está documentada automáticamente gracias a FastAPI. Puedes acceder a la documentación en:
+
+- **Swagger UI**: `http://127.0.0.1:8000/docs`
+- **ReDoc**: `http://127.0.0.1:8000/redoc`
+
+### Endpoints principales
+
+| Método | Ruta                     | Descripción                                   |
+|--------|--------------------------|-----------------------------------------------|
+| GET    | `/productos/`            | Listar todos los productos o buscar por término. |
+| GET    | `/productos/{idproducto}`| Obtener un producto específico.              |
+| POST   | `/productos/`            | Registrar un nuevo producto.                 |
+| PUT    | `/productos/{idproducto}`| Editar un producto existente.                |
+| DELETE | `/productos/{idproducto}`| Eliminar un producto.                        |
 
 ## Contribuir
 
 Las contribuciones son bienvenidas. Por favor, siéntete libre de mejorar esta aplicación y enviar pull requests.
+
+## Licencia
+
+Este proyecto está bajo la licencia MIT.
