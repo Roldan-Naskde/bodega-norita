@@ -63,6 +63,27 @@
                                 Por favor ingresa la cantidad de ingreso.
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label">Categoría*</label>
+                            <input type="text" class="form-control" id="categoria" name="categoria" required>
+                            <div class="invalid-feedback">
+                                Por favor ingresa la categoría.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="empresa" class="form-label">Empresa*</label>
+                            <input type="text" class="form-control" id="empresa" name="empresa" required>
+                            <div class="invalid-feedback">
+                                Por favor ingresa la empresa.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="unidad_medida" class="form-label">Unidad de Medida*</label>
+                            <input type="text" class="form-control" id="unidad_medida" name="unidad_medida" required>
+                            <div class="invalid-feedback">
+                                Por favor ingresa la unidad de medida.
+                            </div>
+                        </div>
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary" id="submitProductBtn">Registrar
                                 Producto</button>
@@ -86,6 +107,9 @@
                                 <th>Precio</th>
                                 <th>Cantidad Ingresada</th>
                                 <th>Cantidad Disponible</th>
+                                <th>Categoría</th>
+                                <th>Empresa</th>
+                                <th>Unidad de Medida</th>
                             </tr>
                         </thead>
                         <tbody id="productsTableBody">
@@ -139,6 +163,27 @@
                                 Por favor ingresa la cantidad de ingreso.
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="editCategoria" class="form-label">Categoría*</label>
+                            <input type="text" class="form-control" id="editCategoria" name="categoria" required>
+                            <div class="invalid-feedback">
+                                Por favor ingresa la categoría.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEmpresa" class="form-label">Empresa*</label>
+                            <input type="text" class="form-control" id="editEmpresa" name="empresa" required>
+                            <div class="invalid-feedback">
+                                Por favor ingresa la empresa.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUnidadMedida" class="form-label">Unidad de Medida*</label>
+                            <input type="text" class="form-control" id="editUnidadMedida" name="unidad_medida" required>
+                            <div class="invalid-feedback">
+                                Por favor ingresa la unidad de medida.
+                            </div>
+                        </div>
                         <input type="hidden" id="editIdProducto">
                     </form>
                 </div>
@@ -167,7 +212,10 @@
                 nombre: formData.get('nombre'),
                 descripcion: formData.get('descripcion'),
                 precio: parseFloat(formData.get('precio')),
-                cantidad_ingreso: parseInt(formData.get('cantidad_ingreso'))
+                cantidad_ingreso: parseInt(formData.get('cantidad_ingreso')),
+                categoria: formData.get('categoria'),
+                empresa: formData.get('empresa'),
+                unidad_medida: formData.get('unidad_medida')
             };
 
             try {
@@ -227,6 +275,9 @@
                         <td>${parseFloat(product.precio).toFixed(2)}</td>
                         <td>${product.cantidad_ingreso}</td>
                         <td>${product.cantidad_disponible}</td>
+                        <td>${product.categoria}</td>
+                        <td>${product.empresa}</td>
+                        <td>${product.unidad_medida}</td>
                         <td>
                             <button class="btn btn-sm btn-info edit-btn" data-id="${product.idproducto}" title="Editar">
                                 <i class="bi bi-pencil"></i>
@@ -291,6 +342,10 @@
                 document.getElementById('editDescripcion').value = product.descripcion;
                 document.getElementById('editPrecio').value = product.precio;
                 document.getElementById('editCantidadIngreso').value = product.cantidad_ingreso;
+                document.getElementById('editCategoria').value = product.categoria;
+                document.getElementById('editEmpresa').value = product.empresa;
+                document.getElementById('editUnidadMedida').value = product.unidad_medida;
+
 
                 // Mostrar el modal
                 const editProductModal = new bootstrap.Modal(document.getElementById('editProductModal'));
@@ -335,8 +390,11 @@
                 const descripcion = document.getElementById('editDescripcion').value;
                 const precio = parseFloat(document.getElementById('editPrecio').value);
                 const cantidad_ingreso = parseInt(document.getElementById('editCantidadIngreso').value);
+                const categoria = document.getElementById('editCategoria').value;
+                const empresa = document.getElementById('editEmpresa').value;
+                const unidad_medida = document.getElementById('editUnidadMedida').value;
 
-                if (!nombre || !descripcion || isNaN(precio) || isNaN(cantidad_ingreso)) {
+                if (!nombre || !descripcion || isNaN(precio) || isNaN(cantidad_ingreso) || !categoria || !empresa || !unidad_medida) {
                     alert('Todos los campos son obligatorios y deben ser válidos.');
                     return;
                 }
@@ -345,7 +403,10 @@
                     nombre,
                     descripcion,
                     precio,
-                    cantidad_ingreso
+                    cantidad_ingreso,
+                    categoria,
+                    empresa,
+                    unidad_medida
                 };
 
                 try {

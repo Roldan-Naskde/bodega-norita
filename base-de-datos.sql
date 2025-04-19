@@ -9,7 +9,10 @@ CREATE TABLE IF NOT EXISTS productos (
     idproducto INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
-    precio DECIMAL(10, 2) NOT NULL
+    precio DECIMAL(10, 2) NOT NULL,
+    categoria VARCHAR(100),
+    empresa VARCHAR(100),
+    unidad_medida VARCHAR(50)
 );
 
 -- Crear la tabla productos_stock
@@ -50,7 +53,10 @@ CREATE PROCEDURE actualizar_producto(
     IN p_nombre VARCHAR(100),
     IN p_descripcion TEXT,
     IN p_precio DECIMAL(10, 2),
-    IN p_cantidad_ingreso INT
+    IN p_cantidad_ingreso INT,
+    IN p_categoria VARCHAR(100),
+    IN p_empresa VARCHAR(100),
+    IN p_unidad_medida VARCHAR(50)
 )
 BEGIN
     -- Declarar una variable para calcular la cantidad disponible
@@ -66,7 +72,10 @@ BEGIN
     SET 
         nombre = p_nombre,
         descripcion = p_descripcion,
-        precio = p_precio
+        precio = p_precio,
+        categoria = p_categoria,
+        empresa = p_empresa,
+        unidad_medida = p_unidad_medida
     WHERE idproducto = p_idproducto;
 
     -- Actualizar la tabla productos_stock
@@ -92,6 +101,9 @@ BEGIN
             p.nombre,
             p.descripcion,
             p.precio,
+            p.categoria,
+            p.empresa,
+            p.unidad_medida,
             ps.cantidad_ingreso,
             ps.cantidad_disponible
         FROM productos p
@@ -104,6 +116,9 @@ BEGIN
             p.nombre,
             p.descripcion,
             p.precio,
+            p.categoria,
+            p.empresa,
+            p.unidad_medida,
             ps.cantidad_ingreso,
             ps.cantidad_disponible
         FROM productos p
@@ -122,6 +137,9 @@ BEGIN
         p.nombre,
         p.descripcion,
         p.precio,
+        p.categoria,
+        p.empresa,
+        p.unidad_medida,
         ps.cantidad_ingreso,
         ps.cantidad_disponible
     FROM 
@@ -138,7 +156,10 @@ CREATE PROCEDURE `registrar_producto`(
     IN p_nombre VARCHAR(100),
     IN p_descripcion TEXT,
     IN p_precio DECIMAL(10, 2),
-    IN p_cantidad_ingreso INT
+    IN p_cantidad_ingreso INT,
+    IN p_categoria VARCHAR(100),
+    IN p_empresa VARCHAR(100),
+    IN p_unidad_medida VARCHAR(50)
 )
 BEGIN
     DECLARE last_id INT;
@@ -147,8 +168,8 @@ BEGIN
     START TRANSACTION;
 
     -- Insertar el producto en la tabla productos
-    INSERT INTO productos (nombre, descripcion, precio)
-    VALUES (p_nombre, p_descripcion, p_precio);
+    INSERT INTO productos (nombre, descripcion, precio, categoria, empresa, unidad_medida)
+    VALUES (p_nombre, p_descripcion, p_precio, p_categoria, p_empresa, p_unidad_medida);
 
     -- Obtener el último id generado
     SET last_id = LAST_INSERT_ID();
@@ -162,9 +183,9 @@ BEGIN
 END$$
 DELIMITER ;
 
--- Llamar al procedimiento almacenado para registrar productos
-CALL registrar_producto('Producto 1', 'Descripción del Producto 1', 10.50, 100);
-CALL registrar_producto('Producto 2', 'Descripción del Producto 2', 20.00, 200);
-CALL registrar_producto('Producto 3', 'Descripción del Producto 3', 15.75, 150);
-CALL registrar_producto('Producto 4', 'Descripción del Producto 4', 30.99, 50);
-CALL registrar_producto('Producto 5', 'Descripción del Producto 5', 25.00, 75);
+-- Llamar al procedimiento almacenado para registrar productos con nueva información
+CALL registrar_producto('Producto 1', 'Descripción del Producto 1', 10.50, 100, 'Electrónica', 'Empresa X', 'Unidad');
+CALL registrar_producto('Producto 2', 'Descripción del Producto 2', 20.00, 200, 'Hogar', 'Empresa Y', 'Caja');
+CALL registrar_producto('Producto 3', 'Descripción del Producto 3', 15.75, 150, 'Ropa', 'Empresa Z', 'Pieza');
+CALL registrar_producto('Producto 4', 'Descripción del Producto 4', 30.99, 50, 'Alimentos', 'Empresa W', 'Paquete');
+CALL registrar_producto('Producto 5', 'Descripción del Producto 5', 25.00, 75, 'Juguetes', 'Empresa V', 'Unidad');

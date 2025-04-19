@@ -11,6 +11,9 @@ class Producto(BaseModel):
     descripcion: str
     precio: float
     cantidad_ingreso: int
+    categoria: str
+    empresa: str
+    unidad_medida: str
 
 
 # Modelo para editar un producto
@@ -19,6 +22,9 @@ class ProductoEditar(BaseModel):
     descripcion: str
     precio: float
     cantidad_ingreso: int
+    categoria: str
+    empresa: str
+    unidad_medida: str
 
 @router.get("/productos/{idproducto}")
 def obtener_producto(idproducto: int):
@@ -74,7 +80,10 @@ def registrar_producto(producto: Producto):
             producto.nombre,
             producto.descripcion,
             producto.precio,
-            producto.cantidad_ingreso
+            producto.cantidad_ingreso,
+            producto.categoria,
+            producto.empresa,
+            producto.unidad_medida
         ])
         connection.commit()
         return {"message": "Producto registrado correctamente"}
@@ -132,7 +141,10 @@ def editar_producto(idproducto: int, producto: ProductoEditar):
             producto.nombre,
             producto.descripcion,
             producto.precio,
-            producto.cantidad_ingreso
+            producto.cantidad_ingreso,
+            producto.categoria,
+            producto.empresa,
+            producto.unidad_medida
         ])
         connection.commit()
         return {"message": "Producto actualizado correctamente"}
