@@ -18,10 +18,10 @@ app.add_middleware(
 
 app.include_router(router)
 
-# Rutas para la API
+# Rutas para la APIz
 @app.get("/")
 def read_root():
-    return {"message": "API de Contactos funcionando correctamente"}
+    return {"message": "API de productos funcionando correctamente"}
 
 
 # Ejecutar la aplicación con Uvicorn
