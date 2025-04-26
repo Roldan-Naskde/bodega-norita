@@ -24,6 +24,13 @@ CREATE TABLE IF NOT EXISTS productos_stock (
     FOREIGN KEY (idproducto) REFERENCES productos(idproducto) ON DELETE CASCADE
 );
 
+--Crear la tabla unidades_medida
+CREATE TABLE IF NO EXISTS unidades_medida (
+  `idunidad` int(11) NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `descripcion` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 DELIMITER $$
 
 CREATE PROCEDURE eliminar_producto(
@@ -56,7 +63,7 @@ CREATE PROCEDURE actualizar_producto(
     IN p_cantidad_ingreso INT,
     IN p_categoria VARCHAR(100),
     IN p_empresa VARCHAR(100),
-    IN p_unidad_medida VARCHAR(50)
+    IN p_unidad_medida INT(50)
 )
 BEGIN
     -- Declarar una variable para calcular la cantidad disponible
@@ -159,7 +166,7 @@ CREATE PROCEDURE `registrar_producto`(
     IN p_cantidad_ingreso INT,
     IN p_categoria VARCHAR(100),
     IN p_empresa VARCHAR(100),
-    IN p_unidad_medida VARCHAR(50)
+    IN p_unidad_medida INT(50)
 )
 BEGIN
     DECLARE last_id INT;
@@ -182,6 +189,15 @@ BEGIN
     COMMIT;
 END$$
 DELIMITER ;
+
+-- INSERTAR DATOS A LA TABLA UNIDADES_MEDIDA
+INSERT INTO `unidades_medida` (`idunidad`, `nombre`, `descripcion`) VALUES
+(1, 'Unidad', 'Unidad individual'),
+(2, 'Caja', 'Caja con múltiples unidades'),
+(3, 'Pieza', 'Pieza única'),
+(4, 'Paquete', 'Paquete sellado'),
+(5, 'Litro', 'Unidad de volumen'),
+(6, 'Kilogramo', 'Unidad de peso');
 
 -- Llamar al procedimiento almacenado para registrar productos con nueva información
 CALL registrar_producto('Producto 1', 'Descripción del Producto 1', 10.50, 100, 'Electrónica', 'Empresa X', 'Unidad');
