@@ -13,7 +13,7 @@ class Producto(BaseModel):
     cantidad_ingreso: int
     categoria: str
     empresa: str
-    unidad_medida: str
+    unidad_medida: int
 
 
 # Modelo para editar un producto
@@ -24,7 +24,28 @@ class ProductoEditar(BaseModel):
     cantidad_ingreso: int
     categoria: str
     empresa: str
-    unidad_medida: str
+    unidad_medida: int
+
+class UnidadMedida(BaseModel):
+    idunidad: int
+    nombre: str
+    descripcion: str | None = None
+
+@router.get("/unidades_medida", response_model=List[UnidadMedida])
+def obtener_unidades_medida():
+    connection = create_connection()
+    if not connection:
+        raise HTTPException(status_code=500, detail="Error al conectar a la base de datos")
+    try:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT idunidad, nombre, descripcion FROM unidades_medida")
+        unidades = cursor.fetchall()
+        return unidades
+    except Exception as e:
+        print(f"Error al obtener unidades de medida: {e}")
+        raise HTTPException(status_code=500, detail="Error al obtener unidades de medida")
+    finally:
+        connection.close()
 
 @router.get("/productos/{idproducto}")
 def obtener_producto(idproducto: int):

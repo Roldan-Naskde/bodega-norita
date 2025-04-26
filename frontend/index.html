@@ -79,7 +79,9 @@
                         </div>
                         <div class="mb-3">
                             <label for="unidad_medida" class="form-label">Unidad de Medida*</label>
-                            <input type="text" class="form-control" id="unidad_medida" name="unidad_medida" required>
+                            <select class="form-control" id="unidad_medida" name="unidad_medida" required>
+                                <option value="1">Kilogramo</option>
+                            </select>
                             <div class="invalid-feedback">
                                 Por favor ingresa la unidad de medida.
                             </div>
@@ -179,7 +181,9 @@
                         </div>
                         <div class="mb-3">
                             <label for="editUnidadMedida" class="form-label">Unidad de Medida*</label>
-                            <input type="text" class="form-control" id="editUnidadMedida" name="unidad_medida" required>
+                            <select class="form-control" id="editUnidadMedida" name="unidad_medida" required>
+                                <option value="1">Kilogramo</option>
+                            </select>
                             <div class="invalid-feedback">
                                 Por favor ingresa la unidad de medida.
                             </div>
@@ -245,6 +249,51 @@
                 alert('Error al registrar el producto');
             }
         }
+
+        //funcion para cargar unidades
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("http://localhost:8000/unidades_medida")
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById("unidad_medida");
+                    data.forEach(unidad => {
+                        const option = document.createElement("option");
+                        option.value = unidad.idunidad; // valor que se envía al backend
+                        option.text = unidad.nombre;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error al cargar unidades de medida:", error);
+                });
+        });
+
+        async function cargarUnidadesMedida(selectId, selectedValue = null) {
+            try {
+                const response = await fetch(`${API_URL}/unidades_medida`);
+                if (!response.ok) {
+                    throw new Error("Error al obtener unidades de medida");
+                }
+
+                const unidades = await response.json();
+                const select = document.getElementById(selectId);
+                select.innerHTML = ""; // Limpiar opciones anteriores
+
+                unidades.forEach(unidad => {
+                    const option = document.createElement("option");
+                    option.value = unidad.idunidad;
+                    option.text = unidad.nombre;
+                    if (selectedValue && selectedValue == unidad.idunidad) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error al cargar unidades de medida:", error);
+            }
+        }
+
+
 
         // Función para cargar los productos
         async function loadProducts() {
@@ -336,6 +385,9 @@
 
                 const product = await response.json();
 
+                // Cargar unidades en el select antes de asignar el valor seleccionado
+                await cargarUnidadesMedida('editUnidadMedida', product.unidad_medida);
+
                 // Cargar los datos del producto en el formulario del modal
                 document.getElementById('editIdProducto').value = idproducto;
                 document.getElementById('editNombre').value = product.nombre;
@@ -344,7 +396,6 @@
                 document.getElementById('editCantidadIngreso').value = product.cantidad_ingreso;
                 document.getElementById('editCategoria').value = product.categoria;
                 document.getElementById('editEmpresa').value = product.empresa;
-                document.getElementById('editUnidadMedida').value = product.unidad_medida;
 
 
                 // Mostrar el modal
